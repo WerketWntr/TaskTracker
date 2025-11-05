@@ -13,11 +13,47 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-        public function index()
+    public function index(Request $request)
     {
-        $tasks = Auth::user()->tasks()->with('category')->get();
-        return view('task.index', compact('tasks'));
+        $user = Auth::user();
+        // Получаем фильтры из запроса
+        $categoryId = $request->input('category_id');
+        $status = $request->input('status');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+
+        // Строим базовый запрос для задач пользователя
+        $query = $user->tasks()->with('category');
+
+        // Фильтр по категории
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        // Фильтр по статусу
+        if ($status === 'completed') {
+            $query->whereNotNull('completed_at');
+        } elseif ($status === 'pending') {
+            $query->whereNull('completed_at');
+        }
+
+        // Фильтр по диапазону дат
+        if ($dateFrom) {
+            $query->whereDate('due_date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('due_date', '<=', $dateTo);
+        }
+
+        // Получаем отфильтрованные задачи
+        $tasks = $query->orderBy('due_date')->get();
+
+        // Для выпадающего списка категорий
+        $categories = $user->category()->get();
+
+        return view('task.index', compact('tasks', 'categories', 'categoryId', 'status', 'dateFrom', 'dateTo'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -73,7 +109,10 @@ class TaskController extends Controller
             'completed_at' => 'nullable|date',
         ]));
 
-        return redirect()->route('categories.index')->with('success', 'Task updated.');
+        $task_data['completed_at'] = $request->has('completed_at') ? now() : null;
+        $task->update($task_data);
+
+        return redirect()->route('tasks.index')->with('success', 'Task updated.');
     }
 
     /**
