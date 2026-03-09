@@ -75,6 +75,22 @@
                             @endif
                         </td>
                     </tr>
+                    <td class="px-4 py-2 flex gap-2">
+                        <a href="{{ route('tasks.edit', $task->id) }}"
+                           class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm">
+                            Edit
+                        </a>
+
+                        <form method="POST" action="{{ route('tasks.destroy', $task->id) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+                                    onclick="return confirm('Delete this task?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
                 @empty
                     <tr>
                         <td colspan="4" class="px-4 py-4 text-center text-gray-500 dark:text-gray-400">
