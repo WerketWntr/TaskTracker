@@ -14,10 +14,10 @@ This is a beginner-level project built to practice Laravel fundamentals includin
 - Blade Templates
 
 ## Installation
-composer install
-npm install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate
-npm run dev
-php artisan serve
+1. composer install
+2. npm install
+3. cp .env.example .env
+4. php artisan key:generate
+5. php artisan migrate
+6. npm run dev
+7. php artisan serve
